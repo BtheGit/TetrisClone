@@ -174,6 +174,7 @@ class Piece {
 
 class Player {
 	constructor(colorScheme = defaultColorScheme){
+		this.score = 0;
 		this.colorScheme = colorScheme;
 		this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT)
 		this.activePiece = new Piece(this.colorScheme);
@@ -195,6 +196,7 @@ class Player {
 				this.activePiece.y--;
 				this.board.mergePiece(this.activePiece)
 				this.resetPiece();
+				this.checkCompletedLines();
 			}
 	}
 
@@ -225,6 +227,29 @@ class Player {
 		this.nextPiece = new Piece(this.colorScheme);
 		this.nextPiece.x = this.board.width + 2;
 		this.nextPiece.y = 1;
+
+	}
+
+	checkCompletedLines() {
+		//variable to track number of lines in one pass
+		let completedLines = 0;
+		//loop through board matrix
+		for (let i = 0; i < this.board.matrix.length; i++){
+			//test if all entries are not 0 (I believe some() is faster - should check)
+			//return true if there aren't any elements that are zero
+			if(!this.board.matrix[i].some((elem) => {return !elem})) {
+				//if so add to variable 
+				completedLines += 1;
+				// then delete that row
+				this.board.matrix.splice(i, 1);
+				//add a new blank row to beginning of array
+				this.board.matrix.unshift(new Array(this.board.matrix[0].length).fill(0))
+				
+			}
+			
+		}
+		console.log(completedLines)
+
 
 	}
 
