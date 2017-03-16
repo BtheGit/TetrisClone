@@ -182,6 +182,7 @@ class Piece {
 class Player {
 	constructor(colorScheme = defaultColorScheme){
 		this.score = 0;
+		this.isDead = false;
 		this.colorScheme = colorScheme;
 		this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT)
 		this.activePiece = new Piece(this.colorScheme);
@@ -226,7 +227,7 @@ class Player {
 	}
 
 	resetPiece() {
-	//find a more elegant method!		
+		//find a more elegant method!		
 		this.activePiece.y = 0;
 		this.activePiece.x = this.activePiece.initX;
 		[this.nextPiece.x, this.nextPiece.y] = [this.activePiece.x, this.activePiece.y]
@@ -234,6 +235,9 @@ class Player {
 		this.nextPiece = new Piece(this.colorScheme);
 		this.nextPiece.x = this.board.width + 2;
 		this.nextPiece.y = 1;
+		if(this.checkBoardCollision()){
+			this.isDead = true;
+		}
 
 	}
 
@@ -268,8 +272,6 @@ class Player {
 		write(this.score, undefined, '25px', ((BOARD_WIDTH * BLOCK) + 60), 200, 'white', 'center')
 	}
 
-
-
 }
 
 function initGame() {
@@ -278,7 +280,6 @@ function initGame() {
 	//global array and iterating through that deleting everything in when moving to 
 	//next screen OR by having global eventlistener function that I overwrite at beginning
 	//of each component lifecycle)
-	document.addEventListener('keydown', handleKeydown);
 
 	let player = new Player(defaultColorScheme);
 
@@ -286,6 +287,30 @@ function initGame() {
 	let dropCounter = 0;
 	let dropInterval = 1000; //in milliseconds
 	let lastTime = 0
+
+	document.addEventListener('keydown', handleKeydown);
+
+	function handleKeydown(event) {
+		if(!player.isDead){
+			if(event.keyCode === 65) {
+				//'a'
+				player.movePiece(-1)
+			} else if (event.keyCode === 68) {
+				//'d'
+				player.movePiece(1)
+			} else if (event.keyCode === 83) {
+				//'s' accelerate drop
+				player.dropPiece()
+				dropCounter = 0;
+			} else if (event.keyCode === 69) {
+				//'e' for rotate clockwise
+				player.activePiece.rotate(1);
+			} else if (event.keyCode === 81) {
+				//'q' for rotate counter-clockwise
+				player.activePiece.rotate(-1)
+			}
+		}
+	}
 
 	gameActive();
 
@@ -295,8 +320,10 @@ function initGame() {
 		lastTime = time;
 		dropCounter += deltaTime;
 		if (dropCounter > dropInterval) {
-			player.dropPiece();
-			dropCounter = 0;
+			if(!player.isDead) {
+				player.dropPiece();
+				dropCounter = 0;
+			}
 		}
 		cls()
 		player.board.render()
@@ -304,25 +331,6 @@ function initGame() {
 		requestAnimationFrame(gameActive)
 	}
 
-	function handleKeydown(event) {
-		if(event.keyCode === 65) {
-			//'a'
-			player.movePiece(-1)
-		} else if (event.keyCode === 68) {
-			//'d'
-			player.movePiece(1)
-		} else if (event.keyCode === 83) {
-			//'s' accelerate drop
-			player.dropPiece()
-			dropCounter = 0;
-		} else if (event.keyCode === 69) {
-			//'e' for rotate clockwise
-			player.activePiece.rotate(1);
-		} else if (event.keyCode === 81) {
-			//'q' for rotate counter-clockwise
-			player.activePiece.rotate(-1)
-		}
-	}
 	
 }
 
