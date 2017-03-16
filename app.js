@@ -150,6 +150,23 @@ class Piece {
 		}
 	}
 
+	rotate(direction) {
+		let swapped = JSON.parse(JSON.stringify(this.matrix));
+		for(let y = 0; y < swapped.length; y++) {
+			for (let x = y; x < swapped[y].length; x++) {
+				[swapped[y][x], swapped[x][y]] = [swapped[x][y], swapped[y][x]]
+			}
+		}
+		if(direction === 1) {
+			for(let i = 0; i < swapped.length; i++) {
+				swapped[i].reverse();
+			}
+		} else if (direction === -1){
+			swapped.reverse();
+		}
+		this.matrix = swapped;
+	}
+
 	render() {
 		drawMatrix(this.matrix, {x: this.x, y: this.y}, this.colorScheme);
 	}
@@ -173,13 +190,12 @@ class Player {
 	}
 
 	dropPiece() {		
-		// if(this.activePiece.y < this.board.height){
 			this.activePiece.y++;
 			if(this.checkBoardCollision()) {
 				this.activePiece.y--;
-				this.mergeAndReset();
+				this.board.mergePiece(this.activePiece)
+				this.resetPiece();
 			}
-		// }
 	}
 
 	checkBoardCollision() {
@@ -200,8 +216,8 @@ class Player {
 		return false;
 	}
 
-	mergeAndReset() {
-		this.board.mergePiece(this.activePiece)
+	resetPiece() {
+	//find a more elegant method!		
 		this.activePiece.y = 0;
 		this.activePiece.x = this.activePiece.initX;
 		[this.nextPiece.x, this.nextPiece.y] = [this.activePiece.x, this.activePiece.y]
@@ -254,16 +270,22 @@ function initGame() {
 	}
 
 	function handleKeydown(event) {
-		if(event.keyCode === 37) {
-			//left key
+		if(event.keyCode === 65) {
+			//'a'
 			player.movePiece(-1)
-		} else if (event.keyCode === 39) {
-			//right key
+		} else if (event.keyCode === 68) {
+			//'d'
 			player.movePiece(1)
-		} else if (event.keyCode === 40) {
-			//down key 
+		} else if (event.keyCode === 83) {
+			//'s' accelerate drop
 			player.dropPiece()
 			dropCounter = 0;
+		} else if (event.keyCode === 69) {
+			//'e' for rotate clockwise
+			player.activePiece.rotate(1);
+		} else if (event.keyCode === 81) {
+			//'q' for rotate counter-clockwise
+			player.activePiece.rotate(-1)
 		}
 	}
 	
