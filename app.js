@@ -22,6 +22,13 @@ function cls() {
 	ctx.fillRect(0,0, canvas.width, canvas.height);		
 }
 
+function write(text, font ='Arial', size, startX, startY, fillStyle, textAlign = "start") {
+	ctx.font = size + " " + font;
+	ctx.fillStyle = fillStyle;
+	ctx.textAlign = textAlign;
+	ctx.fillText(text, startX, startY, 80)
+}
+
 //#### GAME STATE ####
 const defaultColorScheme = {
 	pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
@@ -248,7 +255,9 @@ class Player {
 			}
 			
 		}
-		console.log(completedLines)
+		if(completedLines) {
+			this.score += (completedLines * 5) * (completedLines * 5)
+		}
 
 
 	}
@@ -256,6 +265,7 @@ class Player {
 	render() {
 		this.activePiece.render();
 		this.nextPiece.render();
+		write(this.score, undefined, '25px', ((BOARD_WIDTH * BLOCK) + 60), 200, 'white', 'center')
 	}
 
 
@@ -319,3 +329,7 @@ function initGame() {
 
 
 initGame()
+
+
+//todo make drop interval dynamic based on player progress and have score increased as
+//a multiplier of that somehow
