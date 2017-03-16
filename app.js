@@ -53,63 +53,9 @@ function drawMatrix(matrix, position, colorScheme = defaultColorScheme){
 	}
 }
 
-
-
-function newRandomPiece() {
-	const pieces = 'TLJSZOI';
-	return createPiece(pieces[pieces.length * Math.random() | 0])
-}
-
-function createPiece(type) {
-	switch (type) {
-		case 'T':
-			return ([
-						[0,1,0],
-						[1,1,1],
-						[0,0,0],
-					])
-		case 'L':
-			return ([
-						[0,2,0],
-						[0,2,0],
-						[0,2,2],
-					])
-		case 'O':
-			return ([
-						[3,3],
-						[3,3],
-					])
-		case 'J':
-			return ([
-						[0,4,0],
-						[0,4,0],
-						[4,4,0],
-					])
-		case 'I':
-			return ([
-						[0,5,0,0],
-						[0,5,0,0],
-						[0,5,0,0],
-						[0,5,0,0],
-					])
-		case 'S':
-			return ([
-						[0,6,6],
-						[6,6,0],
-						[0,0,0],
-					])
-		case 'Z':
-			return ([
-						[7,7,0],
-						[0,7,7],
-						[0,0,0],
-					])
-	}
-}
-
 //#### CLASSES ####
 class Board {
-	constructor(width, height) {
+	constructor(width = BOARD_WIDTH, height = BOARD_HEIGHT) {
 		//should start tracking x/y for multiple boards later
 		this.width = width;
 		this.height = height;
@@ -120,7 +66,7 @@ class Board {
 	generateEmptyBoard() {
 		const matrix = [];
 		//I'd like to investigate whether this clever trick is standard or looked down on
-		while(this.height--){ 
+		for(let i = 0; i < this.height; i++){ 
 			matrix.push(new Array(this.width).fill(0))
 		};
 		return matrix;
@@ -215,11 +161,11 @@ class Player {
 		this.colorScheme = colorScheme;
 		this.activePiece = new Piece(this.colorScheme);
 		this.nextPiece = new Piece(this.colorScheme);
-		this.board = new Board()
+		this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT)
 	}
 
 	movePiece(direction) {
-		this.x += direction;
+		this.activePiece.x += direction;
 	}
 
 	dropPiece() {		
