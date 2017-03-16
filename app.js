@@ -8,7 +8,7 @@ const BOARD_WIDTH = 12;
 const BOARD_HEIGHT = 20;
 
 //get the canvas context
-const CANVAS_WIDTH = BLOCK * BOARD_WIDTH;
+const CANVAS_WIDTH = BLOCK * (BOARD_WIDTH + 6);
 const CANVAS_HEIGHT = BLOCK * BOARD_HEIGHT;
 
 let canvas = document.getElementById('gameCanvas');
@@ -53,6 +53,8 @@ function drawMatrix(matrix, position, colorScheme = defaultColorScheme){
 	}
 }
 
+
+
 //#### CLASSES ####
 class Board {
 	constructor(width = BOARD_WIDTH, height = BOARD_HEIGHT) {
@@ -65,20 +67,17 @@ class Board {
 
 	generateEmptyBoard() {
 		const matrix = [];
-		//I'd like to investigate whether this clever trick is standard or looked down on
 		for(let i = 0; i < this.height; i++){ 
 			matrix.push(new Array(this.width).fill(0))
 		};
 		return matrix;
 	}
 
-	mergePiece(player) {
-		const piece = player.activePiece;
-		console.log(player)
-		for (let y = 0; y < piece.length; y++) {
-			for (let x = 0; x < piece[y].length; y++) {
-				if(piece[y][x] !== 0){	
-					this.matrix[y + player.y][x + player.x] = piece[y][x];
+	mergePiece(piece) {
+		for (let y = 0; y < piece.matrix.length; y++) {
+			for (let x = 0; x < piece.matrix[y].length; x++) {
+				if(piece.matrix[y][x] !== 0){	
+					this.matrix[y + piece.y][x + piece.x] = piece.matrix[y][x];
 				}
 			}
 		}
@@ -159,37 +158,40 @@ class Piece {
 class Player {
 	constructor(colorScheme = defaultColorScheme){
 		this.colorScheme = colorScheme;
+		this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT)
 		this.activePiece = new Piece(this.colorScheme);
 		this.nextPiece = new Piece(this.colorScheme);
-		this.board = new Board(BOARD_WIDTH, BOARD_HEIGHT)
+		this.nextPiece.x = this.board.width + 2;
+		this.nextPiece.y = 1;		
 	}
 
 	movePiece(direction) {
 		this.activePiece.x += direction;
-	}
-
-	dropPiece() {		
-		if(this.activePiece.y < this.board.height){
-			this.activePiece.y++;
-			if(this.checkBoardCollision(this.board)) {
-				this.activePiece.y--;
-				this.board.mergePiece(this.activePiece)
-				this.activePiece.y = 0;
-				this.activePiece.y = this.activePiece.initX;
-			}
+		if(this.checkBoardCollision()){
+			this.activePiece.x -= direction;
 		}
 	}
 
-	checkBoardCollision(board) {
-		for (let y = 0; y < this.activePiece.length; y++){
-			for (let x = 0; x < this.activePiece[y].length; x++) {
+	dropPiece() {		
+		// if(this.activePiece.y < this.board.height){
+			this.activePiece.y++;
+			if(this.checkBoardCollision()) {
+				this.activePiece.y--;
+				this.mergeAndReset();
+			}
+		// }
+	}
+
+	checkBoardCollision() {
+		for (let y = 0; y < this.activePiece.matrix.length; y++){
+			for (let x = 0; x < this.activePiece.matrix[y].length; x++) {
 				if(
-					this.activePiece[y][x] !== 0 &&
+					this.activePiece.matrix[y][x] !== 0 &&
 					(
-						board[y + this.activePiece.y] &&
-						board[y + this.activePiece.y][x + this.activePiece.x] 
-					) !== 0
-				) {
+						this.board.matrix[y + this.activePiece.y] &&
+						this.board.matrix[y + this.activePiece.y][x + this.activePiece.x] 
+					) 	!== 0
+				)	{
 					return true;
 				}
 
@@ -198,9 +200,24 @@ class Player {
 		return false;
 	}
 
-	renderActivePiece() {
-		this.activePiece.render();
+	mergeAndReset() {
+		this.board.mergePiece(this.activePiece)
+		this.activePiece.y = 0;
+		this.activePiece.x = this.activePiece.initX;
+		[this.nextPiece.x, this.nextPiece.y] = [this.activePiece.x, this.activePiece.y]
+		this.activePiece = this.nextPiece
+		this.nextPiece = new Piece(this.colorScheme);
+		this.nextPiece.x = this.board.width + 2;
+		this.nextPiece.y = 1;
+
 	}
+
+	render() {
+		this.activePiece.render();
+		this.nextPiece.render();
+	}
+
+
 
 }
 
@@ -212,7 +229,6 @@ function initGame() {
 	//of each component lifecycle)
 	document.addEventListener('keydown', handleKeydown);
 
-	let board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
 	let player = new Player(defaultColorScheme);
 
 	//Used to control drop timing
@@ -232,7 +248,8 @@ function initGame() {
 			dropCounter = 0;
 		}
 		cls()
-		player.renderActivePiece()
+		player.board.render()
+		player.render()
 		requestAnimationFrame(gameActive)
 	}
 
