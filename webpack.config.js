@@ -8,7 +8,7 @@ module.exports = {
       app: './client/main.js'
    },
    output: {
-      path: 'dist',
+      path: 'docs',
       filename: 'bundle.js',
       sourceMapFilename: 'bundle.map'
    },
