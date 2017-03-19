@@ -1,6 +1,5 @@
 import Player from './components/Player';
-import Board from './components/Board';
-import Piece from './components/Piece';
+import {drawMatrix} from './utilities/utilities';
 
 //Since tetris works in blocks, instead of changing the canvas context proportions 20:1
 //(which I assume means overlaying text would require a second canvas rendering), let's
@@ -18,52 +17,12 @@ const CANVAS_HEIGHT = BLOCK * BOARD_HEIGHT;
 let canvas = document.getElementById('gameCanvas');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
-let ctx = canvas.getContext('2d');
-
-//#### Add state for juggling game screens (off load to server?)
-
-//#### General Canvas Utility Functions ####
-// function cls() {
-// 	ctx.fillStyle = 'rgba(0,0,0, 1)';
-// 	ctx.fillRect(0,0, canvas.width, canvas.height);		
-// }
-
-function write(text, font ='Arial', size, startX, startY, fillStyle, textAlign = "start") {
-	ctx.font = size + " " + font;
-	ctx.fillStyle = fillStyle;
-	ctx.textAlign = textAlign;
-	ctx.fillText(text, startX, startY, 80)
-}
 
 //#### GAME STATE ####
+let ctx = canvas.getContext('2d');
 const defaultColorScheme = {
 	pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
 	outline: 'black',
-}
-
-//#### GLOBAL GAME FUNCTIONS ####
-
-function drawMatrix(matrix, position, colorScheme = defaultColorScheme){
-	for(let y = 0; y < matrix.length; y++) {
-		for (let x = 0; x < matrix[y].length; x++){
-			if(matrix[y][x]){
-				ctx.fillStyle = colorScheme.pieces[matrix[y][x] - 1];
-				ctx.fillRect(
-					(x + position.x) * BLOCK, 
-					(y + position.y) * BLOCK, 
-					BLOCK, 
-					BLOCK
-				);	
-				ctx.strokeStyle = colorScheme.outline;
-				ctx.strokeRect(
-					(x + position.x) * BLOCK, 
-					(y + position.y) * BLOCK, 
-					BLOCK, 
-					BLOCK
-				)						
-			}
-		}
-	}
 }
 
 function game() {
@@ -73,7 +32,7 @@ function game() {
 	//next screen OR by having global eventlistener function that I overwrite at beginning
 	//of each component lifecycle)
 
-	let player = new Player(defaultColorScheme);
+	let player = new Player({width: BOARD_WIDTH, height: BOARD_HEIGHT, tileSize: BLOCK, colorScheme: defaultColorScheme, ctx: ctx});
 
 	//Used to control drop timing
 	const DROP_INIT = 1000;
@@ -145,7 +104,7 @@ function game() {
 
 }
 
-initGame()
+game()
 
 
 //todo make drop interval dynamic based on player progress and have score increased as
