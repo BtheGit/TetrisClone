@@ -1,15 +1,24 @@
 var webpack = require("webpack");
 var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
 
 module.exports = {
    entry: {
       app: './client/main.js'
    },
    output: {
-      filename: 'build/bundle.js',
-      sourceMapFilename: 'build/bundle.map'
+      path: 'dist',
+      filename: 'bundle.js',
+      sourceMapFilename: 'bundle.map'
    },
    devtool: 'source-map',
+   plugins: [
+      new HtmlWebpackPlugin({
+         filename: 'index.html',
+         template: 'client/index.html'
+      }),
+   ],
    module: {
       loaders: [{
             test: /\.jsx?$/,
@@ -19,6 +28,10 @@ module.exports = {
                presets: ['es2015', 'stage-0']
             }
          }, 
+         {
+            test: /\.html$/,
+            loader: 'html-loader'
+         },       
          // {
          //    test: /\.css$/,
          //    loader: 'style-loader!css-loader!postcss-loader'
