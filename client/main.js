@@ -45,10 +45,19 @@ function game() {
 	let lastTime = 0
 
 	function clsGameActive() {
-		ctx.fillStyle = 'rgba(0,0,0, 1)';
+		//This is the Sidebar color
+		ctx.fillStyle = 'rgba(175,150,200, .3)';
 		ctx.fillRect(0,0, canvas.width, canvas.height);	
+		//Playing area black
+		ctx.fillStyle = 'rgba(0,0,0, 1)';
+		ctx.fillRect(0,0, BOARD_WIDTH * BLOCK + 2, BOARD_HEIGHT * BLOCK);	
 		ctx.strokeStyle = 'white';
-		ctx.strokeRect(0,0, BOARD_WIDTH * BLOCK, BOARD_HEIGHT * BLOCK)	
+		//Border of playing area
+		ctx.strokeRect(0,0, BOARD_WIDTH * BLOCK + 2, BOARD_HEIGHT * BLOCK);
+		//Border and fill of preview area
+		ctx.strokeRect(BLOCK * BOARD_WIDTH + 10, 10, 100, 100);
+		ctx.fillStyle = 'rgba(100,100,150, .5)';
+		ctx.fillRect(BLOCK * BOARD_WIDTH + 10, 10, 100, 100);
 	}
 
 
@@ -69,10 +78,15 @@ function game() {
 				dropCounter = 0;
 			} else if (event.keyCode === 69) {
 				//'e' for rotate clockwise
-				player.activePiece.rotate(1);
+				player.rotatePiece(1);
 			} else if (event.keyCode === 81) {
 				//'q' for rotate counter-clockwise
-				player.activePiece.rotate(-1)
+				player.rotatePiece(-1)
+			} else if (event.keyCode === 32) {
+				//'Spacebar' for quick drop
+				player.instantDrop();
+			} else if (event.keyCode === 80) {
+				//'p' for pause
 			}
 		}
 	}
@@ -109,7 +123,10 @@ game()
 
 //todo make drop interval dynamic based on player progress and have score increased as
 //a multiplier of that somehow
+//todo, accelerate a fixed number of times with score multiplier increase as well
 
 //todo error checking to prevent rotating into wall
+//fixed but maybe want to add a way to move the piece one over instead of just blocking rotation.
+//not sure what is standard in tetris games
+//it's a wall kick
 
-//todo Can't create a new piece when collision, except when pressing down - stop that

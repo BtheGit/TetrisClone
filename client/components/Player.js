@@ -7,6 +7,7 @@ export default class Player {
 		this.ctx = board.ctx;
 		this.score = 0;
 		this.linesCleared = 0;
+		this.level = 0;
 		this.isDead = false;
 		this.colorScheme = board.colorScheme;
 		this.board = new Board(board)
@@ -23,6 +24,29 @@ export default class Player {
 		}
 	}
 
+	rotatePiece(direction) {
+		//simulating wall-kick effect. not perfect, needs fixing. especially with I shape
+		this.activePiece.rotate(direction);
+		if(this.checkBoardCollision()) {
+			this.movePiece(direction);
+			if(this.checkBoardCollision) {
+				this.movePiece(direction);
+				if(this.checkBoardCollision) {
+					this.movePiece(-direction)
+					this.movePiece(-direction)
+					if(this.checkBoardCollision()) {
+						this.movePiece(-direction)
+						if(this.checkBoardCollision()) {
+							this.movePiece(direction)
+							this.movePiece(direction)
+							this.activePiece.rotate(-direction)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	dropPiece() {		
 			this.activePiece.y++;
 			if(this.checkBoardCollision()) {
@@ -31,6 +55,18 @@ export default class Player {
 				this.resetPiece();
 				this.checkCompletedLines();
 			}
+	}
+
+	instantDrop() {
+		//create soon
+		while(!this.checkBoardCollision()) {
+			this.activePiece.y++;
+		}
+		//Duplicating code drop above. Should I pull this out into a function.
+		this.activePiece.y--;
+		this.board.mergePiece(this.activePiece)
+		this.resetPiece();
+		this.checkCompletedLines();		
 	}
 
 	checkBoardCollision() {
