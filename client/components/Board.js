@@ -1,14 +1,14 @@
 import {drawMatrix} from '../utilities/utilities';
 
 class Board {
-	constructor(board) {
+	constructor(props) {
 		//should start tracking x/y for multiple boards later
-		this.width = board.width;
-		this.height = board.height;
-		this.tileSize = board.tileSize;
-		this.ctx = board.ctx;
+		this.width = props.BOARD_WIDTH;
+		this.height = props.BOARD_HEIGHT;
+		this.tileSize = props.TILESIZE;
+		this.ctx = props.ctx;
 		this.matrix = this.generateEmptyBoard();
-		this.colorScheme = board.colorScheme;
+		this.colorScheme = props.colorScheme;
 	}
 
 	generateEmptyBoard() {

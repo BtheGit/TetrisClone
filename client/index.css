@@ -3,8 +3,19 @@
 	margin: 0;
 }
 
-// canvas {
-// 	background: #000;
-// 	display: block;
-// 	margin: 0 auto;
-// }
+.flex-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.player {
+	flex: 1 1 auto;
+}
+
+h4 {
+	display: inline;
+}
+
+span {
+	display: inline;
+}

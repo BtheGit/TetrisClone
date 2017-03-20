@@ -1,7 +1,7 @@
 var webpack = require("webpack");
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
    entry: {
@@ -18,6 +18,8 @@ module.exports = {
          filename: 'index.html',
          template: 'client/index.html'
       }),
+      new ExtractTextPlugin("index.css"),
+
    ],
    module: {
       loaders: [{
@@ -32,10 +34,10 @@ module.exports = {
             test: /\.html$/,
             loader: 'html-loader'
          },       
-         // {
-         //    test: /\.css$/,
-         //    loader: 'style-loader!css-loader!postcss-loader'
-         // }, 
+         {
+            test: /\.css$/,
+            loader: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
+         },
          // {
          //    test: /\.(jpg|png|svg)$/,
          //    exclude: /icons/,

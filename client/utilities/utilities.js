@@ -31,9 +31,16 @@ export function drawMatrix(
 	}
 }
 
-export function canvasText(ctx, text, font ='Arial', size, startX, startY, fillStyle, textAlign = "start") {
+export function canvasText(ctx, text, font ='Arial', size, startX, startY, fillStyle, textAlign = "start") 
+{
 	ctx.font = size + " " + font;
 	ctx.fillStyle = fillStyle;
 	ctx.textAlign = textAlign;
 	ctx.fillText(text, startX, startY, 80)
+}
+
+export function cls(canvas) 
+{
+	canvas.ctx.fillStyle = 'black';
+	canvas.ctx.fillRect(0,0, canvas.CANVAS_WIDTH, canvas.CANVAS_HEIGHT);	
 }

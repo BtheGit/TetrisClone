@@ -1,124 +1,104 @@
 import Player from './components/Player';
+import Game from './components/Game';
 import {drawMatrix} from './utilities/utilities';
+import './index.css';
 
 //Since tetris works in blocks, instead of changing the canvas context proportions 20:1
 //(which I assume means overlaying text would require a second canvas rendering), let's
 //define a block size and do all calculations with that.
-const BLOCK = 20;
-const LEFT_OFFSET = 200;
-const TOP_OFFSET = 50;
+const TILESIZE = 20;
 const BOARD_WIDTH = 12;
 const BOARD_HEIGHT = 20;
 
 //get the canvas context
-const CANVAS_WIDTH = BLOCK * (BOARD_WIDTH + 6);
-const CANVAS_HEIGHT = BLOCK * BOARD_HEIGHT;
+const CANVAS_WIDTH = TILESIZE * (BOARD_WIDTH + 6);
+const CANVAS_HEIGHT = TILESIZE * BOARD_HEIGHT;
 
-let canvas = document.getElementById('gameCanvas');
-canvas.width = CANVAS_WIDTH;
-canvas.height = CANVAS_HEIGHT;
+//Array to store active instances of Games
+const players = [];
 
-//#### GAME STATE ####
-let ctx = canvas.getContext('2d');
-const defaultColorScheme = {
-	pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
-	outline: 'black',
-}
+const playerElements = document.querySelectorAll('.player');
 
-function game() {
-	//going to have to decide if I want to use global eventlisteners again or component 
-	//ones that are deleted when component is unmounted (perhaps by storing them in
-	//global array and iterating through that deleting everything in when moving to 
-	//next screen OR by having global eventlistener function that I overwrite at beginning
-	//of each component lifecycle)
-
-	let player = new Player({width: BOARD_WIDTH, height: BOARD_HEIGHT, tileSize: BLOCK, colorScheme: defaultColorScheme, ctx: ctx});
-
-	//Used to control drop timing
-	const DROP_INIT = 1000;
-	const DROP_MAX = 50;
-
-	let speedModifier = 1;
-
-	let dropInterval = DROP_INIT; //in milliseconds
-	let dropCounter = 0;
-	let lastTime = 0
-
-	function clsGameActive() {
-		//This is the Sidebar color
-		ctx.fillStyle = 'rgba(175,150,200, .3)';
-		ctx.fillRect(0,0, canvas.width, canvas.height);	
-		//Playing area black
-		ctx.fillStyle = 'rgba(0,0,0, 1)';
-		ctx.fillRect(0,0, BOARD_WIDTH * BLOCK + 2, BOARD_HEIGHT * BLOCK);	
-		ctx.strokeStyle = 'white';
-		//Border of playing area
-		ctx.strokeRect(0,0, BOARD_WIDTH * BLOCK + 2, BOARD_HEIGHT * BLOCK);
-		//Border and fill of preview area
-		ctx.strokeRect(BLOCK * BOARD_WIDTH + 10, 10, 100, 100);
-		ctx.fillStyle = 'rgba(100,100,150, .5)';
-		ctx.fillRect(BLOCK * BOARD_WIDTH + 10, 10, 100, 100);
+playerElements.forEach( elem => {
+	
+	//create individual canvases
+	let canvas = elem.querySelector('.gameCanvas');
+	canvas.width = CANVAS_WIDTH;
+	canvas.height = CANVAS_HEIGHT;
+	let ctx = canvas.getContext('2d');
+	
+	//create a bundle 
+	const canvasProps = {
+		CANVAS_WIDTH,
+		CANVAS_HEIGHT,
+		ctx,
+		TILESIZE,
+		BOARD_HEIGHT,
+		BOARD_WIDTH,
+		colorScheme: {
+			pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
+			outline: 'black',
+		},
 	}
 
+	//initiate new game 
+	const player = new Game(canvasProps);
+	players.push(player);
+})
 
 
-	document.addEventListener('keydown', handleKeydown);
+const playerKeys = [
+	{
+		left: 65,
+		right: 68,
+		down: 83,
+		drop: 32,
+		rotateClock: 69,
+		rotateCount: 81,
+	},
+	{
+		left: 37,
+		right: 39,
+		down: 40,
+		drop: 16,
+		rotateClock: 191,
+		rotateCount: 190,
+	}
+]
 
-	function handleKeydown(event) {
+document.addEventListener('keydown', handleKeydown);
+
+function handleKeydown(event) {
+	playerKeys.forEach( (key, index) => {
+		const player = players[index].player;
 		if(!player.isDead){
-			if(event.keyCode === 65) {
+			if(event.keyCode === key.left) {
 				//'a'
 				player.movePiece(-1)
-			} else if (event.keyCode === 68) {
+			} else if (event.keyCode === key.right) {
 				//'d'
 				player.movePiece(1)
-			} else if (event.keyCode === 83) {
+			} else if (event.keyCode === key.down) {
 				//'s' accelerate drop
 				player.dropPiece()
-				dropCounter = 0;
-			} else if (event.keyCode === 69) {
+			} else if (event.keyCode === key.rotateClock) {
 				//'e' for rotate clockwise
 				player.rotatePiece(1);
-			} else if (event.keyCode === 81) {
+			} else if (event.keyCode === key.rotateCount) {
 				//'q' for rotate counter-clockwise
 				player.rotatePiece(-1)
-			} else if (event.keyCode === 32) {
+			} else if (event.keyCode === key.drop) {
 				//'Spacebar' for quick drop
 				player.instantDrop();
 			} else if (event.keyCode === 80) {
 				//'p' for pause
 			}
 		}
-	}
-
-	function gameActive(time = 0) {
-		clsGameActive();
-		dropInterval = updateDropInterval();
-		//is time argument baked into requestAnimationFrame? Seems like it must be.
-		const deltaTime = time - lastTime;
-		lastTime = time;
-		dropCounter += deltaTime;
-		if (dropCounter > dropInterval) {
-			if(!player.isDead) {
-				player.dropPiece();
-				dropCounter = 0;
-			}
-		}
-		player.board.render()
-		player.render()
-		requestAnimationFrame(gameActive)
-	}
-
-	function updateDropInterval() {
-		// if (player.linesCleared )
-		return DROP_INIT * speedModifier;
-	}
-
-	gameActive();
-
+	})
 }
 
-game()
+
+
 
 
 //todo make drop interval dynamic based on player progress and have score increased as

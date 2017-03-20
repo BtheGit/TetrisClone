@@ -3,14 +3,14 @@ import Piece from './Piece';
 import {canvasText} from '../utilities/utilities';
 
 export default class Player {
-	constructor(board){
-		this.ctx = board.ctx;
+	constructor(props){
+		this.ctx = props.ctx;
 		this.score = 0;
 		this.linesCleared = 0;
 		this.level = 0;
 		this.isDead = false;
-		this.colorScheme = board.colorScheme;
-		this.board = new Board(board)
+		this.colorScheme = props.colorScheme;
+		this.board = new Board(props)
 		this.activePiece = new Piece(this.board);
 		this.nextPiece = new Piece(this.board);
 		this.nextPiece.x = this.board.width + 2;
