@@ -65,7 +65,6 @@ class Piece {
 	}
 
 	rotate(direction) {
-		//TODO: Prevent rotating into wall
 		let swapped = JSON.parse(JSON.stringify(this.matrix));
 		for(let y = 0; y < swapped.length; y++) {
 			for (let x = y; x < swapped[y].length; x++) {

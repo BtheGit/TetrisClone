@@ -7,6 +7,8 @@ export default class Game {
 		this.props = props;
 		this.player = new Player(props);
 
+		this.paused = false;
+
 		//Used to control drop timing
 		this.DROP_INIT = 1000;
 		this.DROP_MAX = 50;
@@ -46,22 +48,24 @@ export default class Game {
 	//of each component lifecycle)
 
 	gameActive(time = 0) {
-		cls(this.props);
-		this.dropInterval = this.updateDropInterval();
-		//is time argument baked into requestAnimationFrame? Seems like it must be.
-		const deltaTime = time - this.lastTime;
-		this.lastTime = time;
-		this.dropCounter += deltaTime;
-		if (this.dropCounter > this.dropInterval) {
-			if(!this.player.isDead) {
-				this.player.dropPiece();
-				this.dropCounter = 0;
+			cls(this.props);
+			this.dropInterval = this.updateDropInterval();
+			//is time argument baked into requestAnimationFrame? Seems like it must be.
+			const deltaTime = time - this.lastTime;
+			this.lastTime = time;
+			this.dropCounter += deltaTime;
+		if(!this.paused) {
+			if (this.dropCounter > this.dropInterval) {
+				if(!this.player.isDead) {
+					this.player.dropPiece();
+					this.dropCounter = 0;
+				}
 			}
 		}
 		this.drawGameBG();
 		this.player.board.render()
 		this.player.render()
-		requestAnimationFrame(this.gameActive)
+		requestAnimationFrame(this.gameActive)			
 	}
 
 	updateDropInterval() {

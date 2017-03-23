@@ -10,6 +10,17 @@ const TILESIZE = 20;
 const BOARD_WIDTH = 12;
 const BOARD_HEIGHT = 20;
 
+const COLOR_SCHEMES = [
+	{
+		pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
+		outline: 'black',
+	},
+	{
+		pieces: ['#A60037', '#F47992', '#FFE8B8', '#8BB195','#73725F', '#786171', '#00DDAA'],
+		outline: 'black',
+	},
+]
+
 //get the canvas context
 const CANVAS_WIDTH = TILESIZE * (BOARD_WIDTH + 6);
 const CANVAS_HEIGHT = TILESIZE * BOARD_HEIGHT;
@@ -17,9 +28,11 @@ const CANVAS_HEIGHT = TILESIZE * BOARD_HEIGHT;
 //Array to store active instances of Games
 const players = [];
 
+//Game uses instances of divs with 'player' class to determine number of players. This could be expanded in theory
+//but also requires manually creating a unique set of controls for each player
 const playerElements = document.querySelectorAll('.player');
 
-playerElements.forEach( elem => {
+playerElements.forEach( (elem, index) => {
 	
 	//create individual canvases
 	let canvas = elem.querySelector('.gameCanvas');
@@ -27,7 +40,7 @@ playerElements.forEach( elem => {
 	canvas.height = CANVAS_HEIGHT;
 	let ctx = canvas.getContext('2d');
 	
-	//create a bundle 
+	//create a bundle of props to deliver down the hierarchy tree {Main -> Game -> Player -> Board & -> Piece}
 	const canvasProps = {
 		CANVAS_WIDTH,
 		CANVAS_HEIGHT,
@@ -35,10 +48,7 @@ playerElements.forEach( elem => {
 		TILESIZE,
 		BOARD_HEIGHT,
 		BOARD_WIDTH,
-		colorScheme: {
-			pieces: ['red', 'blue', 'purple', 'pink','orange', 'indigo', 'green'],
-			outline: 'black',
-		},
+		colorScheme: COLOR_SCHEMES[index]
 	}
 
 	//initiate new game 
@@ -71,7 +81,7 @@ document.addEventListener('keydown', handleKeydown);
 function handleKeydown(event) {
 	playerKeys.forEach( (key, index) => {
 		const player = players[index].player;
-		if(!player.isDead){
+		if(!player.isDead && !players[index].paused){
 			if(event.keyCode === key.left) {
 				//'a'
 				player.movePiece(-1)
@@ -90,9 +100,12 @@ function handleKeydown(event) {
 			} else if (event.keyCode === key.drop) {
 				//'Spacebar' for quick drop
 				player.instantDrop();
-			} else if (event.keyCode === 80) {
-				//'p' for pause
 			}
+		}
+		
+		if (event.keyCode === 80) {
+			//'p' for pause
+			players[index].paused = players[index].paused ? false : true;
 		}
 	})
 }
@@ -105,8 +118,8 @@ function handleKeydown(event) {
 //a multiplier of that somehow
 //todo, accelerate a fixed number of times with score multiplier increase as well
 
-//todo error checking to prevent rotating into wall
-//fixed but maybe want to add a way to move the piece one over instead of just blocking rotation.
-//not sure what is standard in tetris games
-//it's a wall kick
+//TODO: improve wall kick handling (sometimes it kicks the piece two squares over without even rotating)
 
+//todo Add in other player preview screen to show their action
+//Is there a way to prerender canvases to return snapshots of the other players score?
+//That would be way easier than rendering two more canvases concurrently
