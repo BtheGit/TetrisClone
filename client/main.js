@@ -65,6 +65,7 @@ const playerKeys = [
 		drop: 32,
 		rotateClock: 69,
 		rotateCount: 81,
+		pause: 84,
 	},
 	{
 		left: 37,
@@ -73,6 +74,7 @@ const playerKeys = [
 		drop: 16,
 		rotateClock: 191,
 		rotateCount: 190,
+		pause: 80,
 	}
 ]
 
@@ -81,31 +83,26 @@ document.addEventListener('keydown', handleKeydown);
 function handleKeydown(event) {
 	playerKeys.forEach( (key, index) => {
 		const player = players[index].player;
-		if(!player.isDead && !players[index].paused){
-			if(event.keyCode === key.left) {
-				//'a'
-				player.movePiece(-1)
-			} else if (event.keyCode === key.right) {
-				//'d'
-				player.movePiece(1)
-			} else if (event.keyCode === key.down) {
-				//'s' accelerate drop
-				player.dropPiece()
-			} else if (event.keyCode === key.rotateClock) {
-				//'e' for rotate clockwise
-				player.rotatePiece(1);
-			} else if (event.keyCode === key.rotateCount) {
-				//'q' for rotate counter-clockwise
-				player.rotatePiece(-1)
-			} else if (event.keyCode === key.drop) {
-				//'Spacebar' for quick drop
-				player.instantDrop();
+		if(!player.isDead) {
+			if(!players[index].paused){
+				if(event.keyCode === key.left) {
+					player.movePiece(-1)
+				} else if (event.keyCode === key.right) {
+					player.movePiece(1)
+				} else if (event.keyCode === key.down) {
+					player.dropPiece()
+				} else if (event.keyCode === key.rotateClock) {
+					player.rotatePiece(1);
+				} else if (event.keyCode === key.rotateCount) {
+					player.rotatePiece(-1)
+				} else if (event.keyCode === key.drop) {
+					player.instantDrop();
+				}
 			}
-		}
-		
-		if (event.keyCode === 80) {
-			//'p' for pause
-			players[index].paused = players[index].paused ? false : true;
+			
+			if (event.keyCode === key.pause) {
+				players[index].paused = players[index].paused ? false : true;
+			}			
 		}
 	})
 }
