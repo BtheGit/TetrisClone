@@ -4,11 +4,20 @@ import Player from './Player';
 export default class Game {
 
 	constructor(props) {
-		this.props = props;
-		this.player = new Player(props);
+		//create individual canvases
+		let canvas = props.element.querySelector('.gameCanvas');
+		canvas.width = props.CANVAS_WIDTH;
+		canvas.height = props.CANVAS_HEIGHT;
+
+		this.ctx = canvas.getContext('2d');
+		//Add the canvas context into the existing props defining canvas structure
+		this.props = {
+			...props, 
+			ctx: this.ctx
+		}
+		this.player = new Player(this.props);
 
 		this.paused = false;
-
 		//Used to control drop timing
 		this.DROP_INIT = 1000;
 		this.DROP_MAX = 50;
@@ -41,19 +50,13 @@ export default class Game {
 		ctx.fillRect(this.props.TILESIZE * this.props.BOARD_WIDTH + 10, 10, 100, 100);	
 	}
 
-	//going to have to decide if I want to use global eventlisteners again or component 
-	//ones that are deleted when component is unmounted (perhaps by storing them in
-	//global array and iterating through that deleting everything in when moving to 
-	//next screen OR by having global eventlistener function that I overwrite at beginning
-	//of each component lifecycle)
-
 	gameActive(time = 0) {
-			cls(this.props);
-			this.dropInterval = this.updateDropInterval();
-			//is time argument baked into requestAnimationFrame? Seems like it must be.
-			const deltaTime = time - this.lastTime;
-			this.lastTime = time;
-			this.dropCounter += deltaTime;
+		cls(this.props);
+		this.dropInterval = this.updateDropInterval();
+		//is time argument baked into requestAnimationFrame? Seems like it must be.
+		const deltaTime = time - this.lastTime;
+		this.lastTime = time;
+		this.dropCounter += deltaTime;
 		if(!this.paused) {
 			if (this.dropCounter > this.dropInterval) {
 				if(!this.player.isDead) {
