@@ -5,6 +5,8 @@ import {drawMatrix} from './utilities/utilities';
 import './index.css';
 
 const manager = new Manager(document);
+const playerLocal = new manager.createPlayer();
+
 
 const playerKeys = [
 	{
