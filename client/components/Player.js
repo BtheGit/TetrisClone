@@ -1,8 +1,4 @@
-import Board from './Board';
-import Piece from './Piece';
-import {canvasText} from '../utilities/utilities';
-
-export default class Player {
+class Player {
 	constructor(props){
 		this.ctx = props.ctx;
 		this.score = 0;

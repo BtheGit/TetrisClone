@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
 	<div class="flex-container">
@@ -12,7 +13,7 @@
 	</div>
 	<div class="flex-container">
 		<div class="controls">
-			<h3>Player 1 Controls</h3>
+			<h3>Controls</h3>
 			<h4>Left: </h4><span>'a'</span>
 			<h4>Right: </h4><span>'d'</span>
 			<h4>Down: </h4><span>'s'</span>
@@ -20,16 +21,15 @@
 			<h4>Rotate Clockwise: </h4><span>'e'</span>
 			<h4>Rotate Counter-Clockwise: </h4><span>'q'</span>
 		</div>
-		<div class="controls">
-			<h3>Player 2 Controls</h3>
-			<h4>Left: </h4><span>'Left Arrow'</span>
-			<h4>Right: </h4><span>'Right Arrow'</span>
-			<h4>Down: </h4><span>'Down Arrow'</span>
-			<h4>Drop: </h4><span>'Right Shift'</span>
-			<h4>Rotate Clockwise: </h4><span>'/'</span>
-			<h4>Rotate Counter-Clockwise: </h4><span>'.'</span>
-		</div>
 	</div>
-	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+	<script type="text/javascript" src="utilities/utilities.js"></script>
+	<script type="text/javascript" src="components/ConnectionManager.js"></script>
+	<script type="text/javascript" src="components/Piece.js"></script>
+	<script type="text/javascript" src="components/Board.js"></script>
+	<script type="text/javascript" src="components/Player.js"></script>
+	<script type="text/javascript" src="components/Game.js"></script>
+	<script type="text/javascript" src="components/Manager.js"></script>
+	<script type="text/javascript" src="Main.js"></script>
 </body>
 </html>

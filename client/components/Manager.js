@@ -1,6 +1,4 @@
-import Game from './Game';
-
-export default class Manager {
+class Manager {
 	constructor(document) {
 		this.document = document;
 		this.template = this.document.querySelector('#player-template')
@@ -8,6 +6,7 @@ export default class Manager {
 	}
 
 	createPropsBundle(element, index) {
+
 		const TILESIZE = 20;
 		const BOARD_WIDTH = 12;
 		const BOARD_HEIGHT = 20;
@@ -49,10 +48,10 @@ export default class Manager {
 	}
 
 	createPlayer() {
-		const element = this.document.importNode(this.template.content, true)
+		const element = document.importNode(this.template.content, true)
 									 .children[0];
 
-		const game = new Game(this.createPropsBundle(element, index));
+		const game = new Game(this.createPropsBundle(element, 0)); //need to dynamically change index later for color change
 
 		this.document.body.appendChild(game.element);
 

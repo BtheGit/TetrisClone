@@ -1,12 +1,17 @@
-import Manager from './components/Manager';
-import Player from './components/Player';
-import Game from './components/Game';
-import {drawMatrix} from './utilities/utilities';
-import './index.css';
+// import Manager from './components/Manager';
+// import Player from './components/Player';
+// import Game from './components/Game';
+// import ConnectionManager from './components/ConnectionManager';
+// import {drawMatrix} from './utilities/utilities';
+// import './index.css';
 
 const manager = new Manager(document);
-const playerLocal = new manager.createPlayer();
+const playerLocal = manager.createPlayer();
+playerLocal.element.classList.add('local');
+playerLocal.run();
 
+const connectionManager = new ConnectionManager();
+connectionManager.connect(9000)
 
 const playerKeys = [
 	{
@@ -16,14 +21,6 @@ const playerKeys = [
 		drop: 32,
 		rotateClock: 69,
 		rotateCount: 81,
-	},
-	{
-		left: 37,
-		right: 39,
-		down: 40,
-		drop: 16,
-		rotateClock: 191,
-		rotateCount: 190,
 	}
 ]
 
@@ -31,7 +28,7 @@ document.addEventListener('keydown', handleKeydown);
 
 function handleKeydown(event) {
 	playerKeys.forEach( (key, index) => {
-		const player = manager.instances[index].player;
+		const player = playerLocal.player;
 		if(!player.isDead){
 			if(event.keyCode === key.left) {
 				//'a'

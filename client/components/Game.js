@@ -1,20 +1,15 @@
-import {cls} from '../utilities/utilities';
-import Player from './Player';
-
-export default class Game {
+class Game {
 
 	constructor(props) {
-		//create individual canvases
-		let canvas = props.element.querySelector('.gameCanvas');
-		canvas.width = props.CANVAS_WIDTH;
-		canvas.height = props.CANVAS_HEIGHT;
+		//create canvas
+		this.element = props.element;
+		this.canvas = this.element.querySelector('.gameCanvas');
+		this.canvas.width = props.CANVAS_WIDTH;
+		this.canvas.height = props.CANVAS_HEIGHT;
 
-		this.ctx = canvas.getContext('2d');
+		this.ctx = this.canvas.getContext('2d');
 		//Add the canvas context into the existing props defining canvas structure
-		this.props = {
-			...props, 
-			ctx: this.ctx
-		}
+		this.props = Object.assign({}, props, {ctx: this.ctx})
 		this.player = new Player(this.props);
 
 		this.paused = false;
@@ -28,9 +23,8 @@ export default class Game {
 		this.dropCounter = 0;
 		this.lastTime = 0
 
-		this.gameActive = this.gameActive.bind(this)
+		this.run = this.run.bind(this)
 
-		this.gameActive();
 	}
 
 	drawGameBG() {
@@ -50,7 +44,7 @@ export default class Game {
 		ctx.fillRect(this.props.TILESIZE * this.props.BOARD_WIDTH + 10, 10, 100, 100);	
 	}
 
-	gameActive(time = 0) {
+	run(time = 0) {
 		cls(this.props);
 		this.dropInterval = this.updateDropInterval();
 		//is time argument baked into requestAnimationFrame? Seems like it must be.
@@ -68,7 +62,7 @@ export default class Game {
 		this.drawGameBG();
 		this.player.board.render()
 		this.player.render()
-		requestAnimationFrame(this.gameActive)			
+		requestAnimationFrame(this.run)			
 	}
 
 	updateDropInterval() {

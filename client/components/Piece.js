@@ -1,5 +1,3 @@
-import {drawMatrix} from '../utilities/utilities';
-
 class Piece {
 	constructor(board, type = this.newRandomType()) {
 		this.ctx = board.ctx;
@@ -86,4 +84,3 @@ class Piece {
 	}
 }
 
-export default Piece;

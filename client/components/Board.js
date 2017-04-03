@@ -1,5 +1,3 @@
-import {drawMatrix} from '../utilities/utilities';
-
 class Board {
 	constructor(props) {
 		//should start tracking x/y for multiple boards later
@@ -34,4 +32,3 @@ class Board {
 	}
 }
 
-export default Board;
