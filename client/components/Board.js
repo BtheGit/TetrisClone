@@ -21,7 +21,7 @@ class Board {
 		for (let y = 0; y < piece.matrix.length; y++) {
 			for (let x = 0; x < piece.matrix[y].length; x++) {
 				if(piece.matrix[y][x] !== 0){	
-					this.matrix[y + piece.y][x + piece.x] = piece.matrix[y][x];
+					this.matrix[y + piece.pos.y][x + piece.pos.x] = piece.matrix[y][x];
 				}
 			}
 		}

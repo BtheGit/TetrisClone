@@ -7,8 +7,10 @@ class Piece {
 		this.colorScheme = board.colorScheme;
 		this.initX = Math.floor(board.width /2) - 2;
 		this.initY = 0;
-		this.x = this.initX;
-		this.y = this.initY;
+		this.pos = {
+			x: this.initX,
+			y: this.initY	
+		}
 	}
 
 	newRandomType() {
@@ -80,7 +82,7 @@ class Piece {
 	}
 
 	render() {
-		drawMatrix(this.ctx, this.matrix, {x: this.x, y: this.y}, this.tileSize, this.colorScheme);
+		drawMatrix(this.ctx, this.matrix, this.pos, this.tileSize, this.colorScheme);
 	}
 }
 

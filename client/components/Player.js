@@ -10,17 +10,23 @@ class Player {
 		this.board = new Board(props)
 		this.activePiece = new Piece(this.board);
 		this.nextPiece = new Piece(this.board);
-		this.nextPiece.x = this.board.width + 2;
-		this.nextPiece.y = 1;		
+		this.nextPiece.pos.x = this.board.width + 2;
+		this.nextPiece.pos.y = 1;
+
+		//THESE AREN'T FIRING YET. WHY??
+		this.eventHandler.emit('activePieceMatrix', this.activePiece.matrix);	
+		this.eventHandler.emit('nextPieceMatrix', this.nextPiece.matrix);
+		this.eventHandler.emit('boardMatrix', this.board.matrix); //Unnecessary but in case I want preset boards later	
+
 	}
 
 	movePiece(direction) {
-		this.activePiece.x += direction;
+		this.activePiece.pos.x += direction;
 		if(this.checkBoardCollision()){
-			this.activePiece.x -= direction;
-			return; //So position change isn't emitted below
+			this.activePiece.pos.x -= direction;
+			return; //So the position change isn't emitted below (it will be emitted in the reset function instead)
 		}
-			this.eventHandler.emit('posX', this.activePiece.x)		
+			this.eventHandler.emit('activePiecePos', this.activePiece.pos)		
 	}
 
 	rotatePiece(direction) {
@@ -44,28 +50,30 @@ class Player {
 				}
 			}
 		}
+		this.eventHandler.emit('activePieceMatrix', this.activePiece.matrix);		
 	}
 
 	handleDropCollision() {
-		this.activePiece.y--;
+		this.activePiece.pos.y--;
 		this.board.mergePiece(this.activePiece)
+		this.eventHandler.emit('boardMatrix', this.board.matrix)
 		this.resetPiece();
 		this.checkCompletedLines();	
 	}
 
 	dropPiece() {		
-			this.activePiece.y++;
+			this.activePiece.pos.y++;
 			if(this.checkBoardCollision()) {
 				this.handleDropCollision();
-				return; //So the position change isn't emitted below
+				return; //So the position change isn't emitted below (it will be emitted in the reset function instead)
 			}
-			this.eventHandler.emit('posX', this.activePiece.x)
+			this.eventHandler.emit('activePiecePos', this.activePiece.pos)
 	}
 
 	instantDrop() {
 		//create soon
 		while(!this.checkBoardCollision()) {
-			this.activePiece.y++;
+			this.activePiece.pos.y++;
 		}
 		this.handleDropCollision();		
 	}
@@ -76,8 +84,8 @@ class Player {
 				if(
 					this.activePiece.matrix[y][x] !== 0 &&
 					(
-						this.board.matrix[y + this.activePiece.y] &&
-						this.board.matrix[y + this.activePiece.y][x + this.activePiece.x] 
+						this.board.matrix[y + this.activePiece.pos.y] &&
+						this.board.matrix[y + this.activePiece.pos.y][x + this.activePiece.pos.x] 
 					) 	!== 0
 				)	{
 					return true;
@@ -92,8 +100,12 @@ class Player {
 		//find a more elegant method!		
 		this.activePiece = new Piece(this.board, this.nextPiece.type)
 		this.nextPiece = new Piece(this.board);
-		this.nextPiece.x = this.board.width + 2;
-		this.nextPiece.y = 1;
+		this.nextPiece.pos.x = this.board.width + 2;
+		this.nextPiece.pos.y = 1;
+
+		this.eventHandler.emit('activePiecePos', this.activePiece.pos)
+		this.eventHandler.emit('activePieceMatrix', this.activePiece.matrix)
+		this.eventHandler.emit('nextPieceMatrix', this.nextPiece.matrix)
 
 		//Kills player and ends game as soon as new piece tries to spawn on occupied board space
 		if(this.checkBoardCollision()){
@@ -116,14 +128,14 @@ class Player {
 				this.board.matrix.splice(i, 1);
 				//add a new blank row to beginning of array
 				this.board.matrix.unshift(new Array(this.board.matrix[0].length).fill(0))
-				
+				this.eventHandler.emit('boardMatrix', this.board.matrix)
 			}
 			
 		}
 		if(completedLines) {
 			this.linesCleared += completedLines;
 			const newScore = this.score + (completedLines * 5) * (completedLines * 5);
-			this.eventHandler.emit('score', newScore)
+			this.updateScore(newScore);
 		}
 
 
@@ -131,6 +143,7 @@ class Player {
 
 	updateScore(newScore) {
 		this.score = newScore;
+		this.eventHandler.emit('score', newScore)
 	}
 
 	render() {

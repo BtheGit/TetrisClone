@@ -13,11 +13,6 @@ class Game {
 
 		this.player = new Player(this.props);
 		
-		//Updating player state from here will make it easier to receive remote updates for remote instances
-		this.player.eventHandler.listen('score', score => {
-			this.player.updateScore(score);
-		})
-
 		this.paused = false;
 		//Used to control drop timing
 		this.DROP_INIT = 1000;
@@ -85,23 +80,20 @@ class Game {
 		//Send local state to server to broadcast to all other players
 		return {
 			board: this.player.board.matrix,
-			activePiece: this.player.activePiece.matrix,
-			activePieceX: this.player.activePiece.x,
-			activePieceY: this.player.activePiece.y,
-			// nextPiece: this.player.nextPiece.matrix,
+			activePieceMatrix: this.player.activePiece.matrix,
+			activePiecePos: this.player.activePiece.pos,
+			nextPieceMatrix: this.player.nextPiece.matrix,
 			score: this.player.score,
 		}
 	}
 
 	receiveRemoteState(state) {
-		//Update remote instances state in local instance
-		this.player.board.matrix = Object.assign(state.board)
-		this.player.activePiece.matrix = Object.assign(state.activePiece)
-		this.player.activePiece.x = Object.assign(state.activePieceX)
-		this.player.activePiece.y = Object.assign(state.activePieceY)
-		// this.player.nextPiece = Object.assign(state.nextPiece)
+		//Update local copies of remote instance's state
+		this.player.board.matrix = Object.assign(state.boardMatrix)
+		this.player.activePiece.matrix = Object.assign(state.activePieceMatrix)
+		this.player.activePiece.pos = Object.assign(state.activePiecePos)
+		this.player.nextPiece.matrix = Object.assign(state.nextPieceMatrix)
 		this.player.updateScore(Object.assign(state.score))
-		//UPDATE SCORE AND REDRAW?
 	}
 
 
