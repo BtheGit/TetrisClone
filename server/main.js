@@ -26,7 +26,6 @@ function createSession(id) {
 		throw new Error('Session already exists')
 	}
 
-	console.log('Creating Session')
 	const session = new Session(id);
 	sessionsMap.set(id, session);	
 	
@@ -39,7 +38,7 @@ function createClient(socket, id = generateRandomId()) {
 
 function broadcastSession(session) {
 	//extract all clients into new array using spread operator
-	const clients = [...session.clients]
+	const clients = [...session.clients] || []; //To avoid server crash if there are no clients
 	clients.forEach( client => {
 		client.send({
 			type: 'sessionBroadcast',
@@ -76,7 +75,7 @@ io.on('connection', (socket) => {
 
 		if(data.type === 'createSession'){
 
-			console.log('Session created')
+			console.log('Creating Session')
 
 			const session = createSession(generateRandomId()); //could also just use socket id?
 			session.join(client);
@@ -99,7 +98,9 @@ io.on('connection', (socket) => {
 		}
 
 		else if (data.type === 'clientUpdate') {
-
+			//Receive state updates from clients
+			client.state[data.key] = data.state;
+			client.broadcast(data)
 		}
 	});
 
