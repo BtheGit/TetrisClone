@@ -1,6 +1,7 @@
 class Player {
 	constructor(props){
 		this.ctx = props.ctx;
+		this.eventHandler = new EventHandler();		
 		this.score = 0;
 		this.linesCleared = 0;
 		this.level = 0;
@@ -17,7 +18,9 @@ class Player {
 		this.activePiece.x += direction;
 		if(this.checkBoardCollision()){
 			this.activePiece.x -= direction;
+			return; //So position change isn't emitted below
 		}
+			this.eventHandler.emit('posX', this.activePiece.x)		
 	}
 
 	rotatePiece(direction) {
@@ -43,14 +46,20 @@ class Player {
 		}
 	}
 
+	handleDropCollision() {
+		this.activePiece.y--;
+		this.board.mergePiece(this.activePiece)
+		this.resetPiece();
+		this.checkCompletedLines();	
+	}
+
 	dropPiece() {		
 			this.activePiece.y++;
 			if(this.checkBoardCollision()) {
-				this.activePiece.y--;
-				this.board.mergePiece(this.activePiece)
-				this.resetPiece();
-				this.checkCompletedLines();
+				this.handleDropCollision();
+				return; //So the position change isn't emitted below
 			}
+			this.eventHandler.emit('posX', this.activePiece.x)
 	}
 
 	instantDrop() {
@@ -58,11 +67,7 @@ class Player {
 		while(!this.checkBoardCollision()) {
 			this.activePiece.y++;
 		}
-		//Duplicating code drop above. Should I pull this out into a function.
-		this.activePiece.y--;
-		this.board.mergePiece(this.activePiece)
-		this.resetPiece();
-		this.checkCompletedLines();		
+		this.handleDropCollision();		
 	}
 
 	checkBoardCollision() {
@@ -117,10 +122,15 @@ class Player {
 		}
 		if(completedLines) {
 			this.linesCleared += completedLines;
-			this.score += (completedLines * 5) * (completedLines * 5)
+			const newScore = this.score + (completedLines * 5) * (completedLines * 5);
+			this.eventHandler.emit('score', newScore)
 		}
 
 
+	}
+
+	updateScore(newScore) {
+		this.score = newScore;
 	}
 
 	render() {

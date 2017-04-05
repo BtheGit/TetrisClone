@@ -2,6 +2,7 @@ class Manager {
 	constructor(document) {
 		this.document = document;
 		this.template = this.document.querySelector('#player-template')
+		this.canvasContainer = document.getElementById('canvasContainer');
 		this.instances = [];
 	}
 
@@ -53,7 +54,9 @@ class Manager {
 
 		const game = new Game(this.createPropsBundle(element, 0)); //need to dynamically change index later for color change
 
-		this.document.body.appendChild(game.element);
+
+		//Add Game Instance to flex-box container
+		this.canvasContainer.appendChild(game.element);
 
 		this.instances.push(game);
 
@@ -61,6 +64,7 @@ class Manager {
 	}
 
 	removePlayer(game) {
-		this.document.body.removeChild(game.element)
+		console.log('removing remote game')
+		this.canvasContainer.removeChild(game.element)
 	}
 }

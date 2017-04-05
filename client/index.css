@@ -3,19 +3,33 @@
 	margin: 0;
 }
 
-.flex-container {
-	display: flex;
-	flex-direction: row;
-}
-
-.player {
-	flex: 1 1 auto;
-}
-
 h4 {
 	display: inline;
 }
 
 span {
 	display: inline;
+}
+
+#canvasContainer {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.flex-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+
+/*.player {
+	flex: 1 1 auto;
+}*/
+
+.gameCanvas {
+	border: solid 3px 'gray';
+}
+
+.player.local {
+	border: solid 3px 'red';
 }

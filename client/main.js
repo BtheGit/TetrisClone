@@ -1,16 +1,9 @@
-// import Manager from './components/Manager';
-// import Player from './components/Player';
-// import Game from './components/Game';
-// import ConnectionManager from './components/ConnectionManager';
-// import {drawMatrix} from './utilities/utilities';
-// import './index.css';
-
 const manager = new Manager(document);
 const playerLocal = manager.createPlayer();
 playerLocal.element.classList.add('local');
 playerLocal.run();
 
-const connectionManager = new ConnectionManager();
+const connectionManager = new ConnectionManager(manager);
 connectionManager.connect(9000)
 
 const playerKeys = [

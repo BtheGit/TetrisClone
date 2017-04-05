@@ -10,7 +10,13 @@ class Game {
 		this.ctx = this.canvas.getContext('2d');
 		//Add the canvas context into the existing props defining canvas structure
 		this.props = Object.assign({}, props, {ctx: this.ctx})
+
 		this.player = new Player(this.props);
+		
+		//Updating player state from here will make it easier to receive remote updates for remote instances
+		this.player.eventHandler.listen('score', score => {
+			this.player.updateScore(score);
+		})
 
 		this.paused = false;
 		//Used to control drop timing
@@ -44,6 +50,12 @@ class Game {
 		ctx.fillRect(this.props.TILESIZE * this.props.BOARD_WIDTH + 10, 10, 100, 100);	
 	}
 
+	draw() {
+		this.drawGameBG();
+		this.player.board.render()
+		this.player.render()
+	}
+
 	run(time = 0) {
 		cls(this.props);
 		this.dropInterval = this.updateDropInterval();
@@ -59,16 +71,39 @@ class Game {
 				}
 			}
 		}
-		this.drawGameBG();
-		this.player.board.render()
-		this.player.render()
-		requestAnimationFrame(this.run)			
+
+		this.draw();
+		requestAnimationFrame(this.run);		
 	}
 
 	updateDropInterval() {
 		// if (player.linesCleared )
 		return this.DROP_INIT * this.speedModifier;
 	}
+
+	sendLocalState() {
+		//Send local state to server to broadcast to all other players
+		return {
+			board: this.player.board.matrix,
+			activePiece: this.player.activePiece.matrix,
+			activePieceX: this.player.activePiece.x,
+			activePieceY: this.player.activePiece.y,
+			// nextPiece: this.player.nextPiece.matrix,
+			score: this.player.score,
+		}
+	}
+
+	receiveRemoteState(state) {
+		//Update remote instances state in local instance
+		this.player.board.matrix = Object.assign(state.board)
+		this.player.activePiece.matrix = Object.assign(state.activePiece)
+		this.player.activePiece.x = Object.assign(state.activePieceX)
+		this.player.activePiece.y = Object.assign(state.activePieceY)
+		// this.player.nextPiece = Object.assign(state.nextPiece)
+		this.player.updateScore(Object.assign(state.score))
+		//UPDATE SCORE AND REDRAW?
+	}
+
 
 
 }
