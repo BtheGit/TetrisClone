@@ -14,12 +14,12 @@ span {
 #canvasContainer {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 .flex-container {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-around;
 }
 
 /*.player {

@@ -12,12 +12,6 @@ class Player {
 		this.nextPiece = new Piece(this.board);
 		this.nextPiece.pos.x = this.board.width + 2;
 		this.nextPiece.pos.y = 1;
-
-		//THESE AREN'T FIRING YET. WHY??
-		this.eventHandler.emit('activePieceMatrix', this.activePiece.matrix);	
-		this.eventHandler.emit('nextPieceMatrix', this.nextPiece.matrix);
-		this.eventHandler.emit('boardMatrix', this.board.matrix); //Unnecessary but in case I want preset boards later	
-
 	}
 
 	movePiece(direction) {

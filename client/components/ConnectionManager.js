@@ -4,7 +4,6 @@ class ConnectionManager {
 		this.peers = new Map;
 		this.manager = manager;
 		this.localInstance = this.manager.instances[0];
-		// this.sessionId = null;
 
 	}
 
@@ -15,7 +14,9 @@ class ConnectionManager {
 			console.log('Connected to server');
 
 			this.initSession();
+			this.initEventHandlers();
 			this.localStateListeners();
+			this.updateServer();
 
 			this.connection.on('message', (packet) => {
 				this.receive(packet);
@@ -26,7 +27,6 @@ class ConnectionManager {
 	initSession() {
 		const sessionId = window.location.hash.split('#')[1];
 		const localState = this.localInstance.sendLocalState()
-		// const sessionId = this.sessionId;
 		if(sessionId) {
 			console.log('Joining Session', sessionId)
 			this.send({
@@ -40,17 +40,15 @@ class ConnectionManager {
 				type: 'createSession'
 			})
 		}
-		this.initEventHandlers();
-
 	}
 
 	initEventHandlers() {
-		//Have server broadcast initial state for new instances to overwrite defaults
+		//Have server broadcast state for new instances to overwrite defaults on initializing them
 		const player = this.localInstance.player;
 
+		player.eventHandler.emit('boardMatrix', player.board.matrix); 
 		player.eventHandler.emit('activePieceMatrix', player.activePiece.matrix);	
 		player.eventHandler.emit('nextPieceMatrix', player.nextPiece.matrix);
-		player.eventHandler.emit('boardMatrix', player.board.matrix); 
 		player.eventHandler.emit('score', player.score);
 		player.eventHandler.emit('activePiecePos', player.activePiece.pos);					
 	}
@@ -59,8 +57,8 @@ class ConnectionManager {
 		const data = JSON.parse(packet);
 
 		if (data.type === 'sessionCreated') {
+			//This hash will act as the session/room id to sync players
 			window.location.hash = data.id;
-			// this.sessionId = data.id;
 		}
 		else if (data.type === 'sessionBroadcast') {
 			//adding on new remote instances to track
@@ -78,7 +76,7 @@ class ConnectionManager {
 
 	localStateListeners() {
 		//This could be refactored to avoid duplication. But for now I like seeing it clearly delineated
-		this.localInstance.player.eventHandler.listen('score', score => {
+		this.localInstance.player.eventHandler.listen('score', state => {
 			this.send({
 				type: 'clientUpdate',
 				key: 'score',
@@ -119,16 +117,18 @@ class ConnectionManager {
 		})		
 	}
 
+	//CURRENTLY UNUSED
 	updateServer() {
 		//Compose packet with local game state to send to server to broadcast 
-		const state = this.localInstance.sendLocalState();
-		const packet = {
-			type: 'clientUpdate',
-			state
+		const stateBundle = this.localInstance.sendLocalState();
+		for(let key in stateBundle) {
+			const packet = {
+				type: 'clientUpdate',
+				key,
+				state: stateBundle[key]
+			}
+			this.send(packet);
 		}
-
-		this.send(packet);
-
 	}
 
 	updateManager(instances) {
@@ -142,8 +142,8 @@ class ConnectionManager {
 			if(!this.peers.has(instance)) {
 				//Create and initialize new local instance (needs to be given remote state or else random seed)
 				const newInstance = this.manager.createPlayer();
-				newInstance.run();
 				newInstance.receiveRemoteState(instance.state); 
+				newInstance.run();
 				this.peers.set(instance.id, newInstance)
 			}
 		})
@@ -157,16 +157,15 @@ class ConnectionManager {
                 this.peers.delete(id);
             }			
 		})
-
-
-        // const local = this.manager.instances[0];
-        // const sorted = peers.clients.map(client => this.peers.get(client.id) || local);
-        // this.manager.sortPlayers(sorted);		
+		
+		//TODO: Sort so local player is always in first position
+        const local = this.manager.instances[0];
+        const sorted = instances.clients.map(client => this.peers.get(client.id) || local);
+        this.manager.sortPlayers(sorted);		
 
 	}	
 
 	updatePeer(data) {
-		console.log(data)
         if (!this.peers.has(data.clientId)) {
             throw new Error('Client does not exist', data.clientId);
         }
@@ -189,7 +188,5 @@ class ConnectionManager {
         else if (data.key === 'score') {
         	player.updateScore(data.state);
         }
-
-        // game.draw();
 	}
 }

@@ -58,3 +58,5 @@ function handleKeydown(event) {
 //todo Add in other player preview screen to show their action
 //Is there a way to prerender canvases to return snapshots of the other players score?
 //That would be way easier than rendering two more canvases concurrently
+
+//TODO: Add in player names

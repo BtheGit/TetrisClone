@@ -67,4 +67,10 @@ class Manager {
 		console.log('removing remote game')
 		this.canvasContainer.removeChild(game.element)
 	}
+
+	sortPlayers(players) {
+		players.forEach(player => {
+			this.canvasContainer.appendChild(player.element)
+		})
+	}
 }

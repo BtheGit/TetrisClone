@@ -17,7 +17,9 @@ class Board {
 		return matrix;
 	}
 
+	//Why is the matrix an empty aray returning undefined?
 	mergePiece(piece) {
+		console.log(this.matrix, this.piece)
 		for (let y = 0; y < piece.matrix.length; y++) {
 			for (let x = 0; x < piece.matrix[y].length; x++) {
 				if(piece.matrix[y][x] !== 0){	

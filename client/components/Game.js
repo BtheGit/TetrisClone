@@ -61,8 +61,12 @@ class Game {
 		if(!this.paused) {
 			if (this.dropCounter > this.dropInterval) {
 				if(!this.player.isDead) {
-					this.player.dropPiece();
-					this.dropCounter = 0;
+					//This last IF is because the program was running initially without a board or piece to merge and throwing an error
+					if(this.player.board.matrix.length && this.player.activePiece.matrix !== undefined) {
+						this.player.dropPiece();
+						this.dropCounter = 0;
+						
+					}
 				}
 			}
 		}
@@ -89,11 +93,12 @@ class Game {
 
 	receiveRemoteState(state) {
 		//Update local copies of remote instance's state
-		this.player.board.matrix = Object.assign(state.boardMatrix)
-		this.player.activePiece.matrix = Object.assign(state.activePieceMatrix)
-		this.player.activePiece.pos = Object.assign(state.activePiecePos)
-		this.player.nextPiece.matrix = Object.assign(state.nextPieceMatrix)
-		this.player.updateScore(Object.assign(state.score))
+		this.player.board.matrix = Object.assign(state.boardMatrix);
+		this.player.activePiece.matrix = Object.assign(state.activePieceMatrix);
+		this.player.activePiece.pos = Object.assign(state.activePiecePos);
+		this.player.nextPiece.matrix = Object.assign(state.nextPieceMatrix);
+		this.player.updateScore(Object.assign(state.score));
+		this.draw();
 	}
 
 
