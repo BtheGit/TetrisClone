@@ -14,6 +14,7 @@ const playerKeys = [
 		drop: 32,
 		rotateClock: 69,
 		rotateCount: 81,
+		pause: 80,
 	}
 ]
 
@@ -41,7 +42,7 @@ function handleKeydown(event) {
 			} else if (event.keyCode === key.drop) {
 				//'Spacebar' for quick drop
 				player.instantDrop();
-			} else if (event.keyCode === 80) {
+			} else if (event.keyCode === key.pause) {
 				//'p' for pause
 			}
 		}

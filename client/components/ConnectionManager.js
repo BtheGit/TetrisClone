@@ -18,10 +18,32 @@ class ConnectionManager {
 			this.localStateListeners();
 			this.updateServer();
 
+			//All server messages will be handled through here instead of separate emit/on handlers
 			this.connection.on('message', (packet) => {
 				this.receive(packet);
 			});
 		});
+	}
+
+	receive(packet) {
+		const data = JSON.parse(packet);
+
+		if (data.type === 'sessionCreated') {
+			//This hash will act as the session/room id to sync players
+			window.location.hash = data.id;
+		}
+		else if (data.type === 'sessionBroadcast') {
+			//adding on new remote instances to track
+			this.updateManager(data.peers);
+		}
+		else if (data.type === 'clientUpdate') {
+			this.updatePeer(data)
+		}
+	}
+
+	send(data) {
+		const packet = JSON.stringify(data);
+		this.connection.send(packet);
 	}
 
 	initSession() {
@@ -53,27 +75,8 @@ class ConnectionManager {
 		player.eventHandler.emit('activePiecePos', player.activePiece.pos);					
 	}
 
-	receive(packet) {
-		const data = JSON.parse(packet);
 
-		if (data.type === 'sessionCreated') {
-			//This hash will act as the session/room id to sync players
-			window.location.hash = data.id;
-		}
-		else if (data.type === 'sessionBroadcast') {
-			//adding on new remote instances to track
-			this.updateManager(data.peers);
-		}
-		else if (data.type === 'clientUpdate') {
-			this.updatePeer(data)
-		}
-	}
-
-	send(data) {
-		const packet = JSON.stringify(data);
-		this.connection.send(packet);
-	}
-
+	//Listening to all important changes to local instance state to broadcast to server
 	localStateListeners() {
 		//This could be refactored to avoid duplication. But for now I like seeing it clearly delineated
 		this.localInstance.player.eventHandler.listen('score', state => {
@@ -131,20 +134,20 @@ class ConnectionManager {
 		}
 	}
 
+	//Handle new remote clients joining session or leaving session
 	updateManager(instances) {
 		//Create a filtered list of remote peers
 		const myId = instances.you;
 		const remoteInstances = instances.clients.filter(client => client.id !== myId)
 
-
 		//create local copies of remote instances and initialize their state
 		remoteInstances.forEach(instance => {
-			if(!this.peers.has(instance)) {
+			if(!this.peers.has(instance.id)) {
 				//Create and initialize new local instance (needs to be given remote state or else random seed)
 				const newInstance = this.manager.createPlayer();
+				this.peers.set(instance.id, newInstance)
 				newInstance.receiveRemoteState(instance.state); 
 				newInstance.run();
-				this.peers.set(instance.id, newInstance)
 			}
 		})
 
@@ -159,12 +162,13 @@ class ConnectionManager {
 		})
 		
 		//TODO: Sort so local player is always in first position
-        const local = this.manager.instances[0];
-        const sorted = instances.clients.map(client => this.peers.get(client.id) || local);
-        this.manager.sortPlayers(sorted);		
+        // const local = this.manager.instances[0];
+        // const sorted = instances.clients.map(client => this.peers.get(client.id) || local);
+        // this.manager.sortPlayers(sorted);	
 
 	}	
 
+	//Update local copies of remote instances with state changes.
 	updatePeer(data) {
         if (!this.peers.has(data.clientId)) {
             throw new Error('Client does not exist', data.clientId);

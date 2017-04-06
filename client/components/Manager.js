@@ -68,9 +68,9 @@ class Manager {
 		this.canvasContainer.removeChild(game.element)
 	}
 
-	sortPlayers(players) {
-		players.forEach(player => {
-			this.canvasContainer.appendChild(player.element)
-		})
-	}
+	// sortPlayers(players) {
+	// 	players.forEach(player => {
+	// 		this.canvasContainer.appendChild(player.element)
+	// 	})
+	// }
 }
